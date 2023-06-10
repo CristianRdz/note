@@ -1,149 +1,135 @@
-import { View, Text,StyleSheet} from 'react-native'
-import React, { useState } from 'react'
-import { Card, Icon, Input, Button} from 'react-native-elements'
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import Toast from "react-native-toast-message";
+import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { Card, Icon, Input, Button } from 'react-native-elements';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import Toast from 'react-native-toast-message';
 import { crearNota } from '../services/NotasService';
 import Loading from '../common/Loading';
-import { TextInput } from 'react-native';
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useNavigation } from '@react-navigation/native';
 
 export default function NuevaNota() {
+  const navigation = useNavigation();
+  const {routes} = navigation.getState();
+  const {params} = routes[routes.length - 1];
+  const {cargarNotas} = params;
+
   const [isLoading, setIsLoading] = useState(false);
   const formik = useFormik({
     initialValues: {
-      titulo: "",
-      contenido: "",
+      titulo: '',
+      contenido: '',
     },
     validateOnChange: false,
     validationSchema: Yup.object({
-      titulo: Yup.string().required("El titulo es obligatorio"),
-      contenido: Yup.string().required("El contenido es obligatorio"),
+      titulo: Yup.string().required('El título es obligatorio'),
+      contenido: Yup.string().required('El contenido es obligatorio'),
     }),
     onSubmit: async (formData) => {
       try {
-        const tituloForm : string = formData.titulo;
-        const contenidoForm : string = formData.contenido;
+        const tituloForm: string = formData.titulo;
+        const contenidoForm: string = formData.contenido;
+        console.log(formData);
         await crearNota(tituloForm, contenidoForm);
+        await cargarNotas();
+        navigation.goBack();
         Toast.show({
-          type: "success",
-          position: "top",
-          text1: "Correo enviado",
-          text2: "El correo se ha enviado correctamente",
+          type: 'success',
+          position: 'top',
+          text1: 'Nota creada',
+          text2: 'La nota se ha creado correctamente',
         });
       } catch (error) {
         console.log(error);
         Toast.show({
-          type: "error",
-          position: "top",
-          text1: "Error al enviar el correo",
-          text2:
-            "Ha ocurrido un error al enviar el correo, intentelo mas tarde",
+          type: 'error',
+          position: 'top',
+          text1: 'Error al crear la nota',
+          text2: 'Ha ocurrido un error al crear la nota, inténtelo más tarde',
         });
       }
     },
   });
+
   return (
-    <View style={styles.viewContent}>
+    <KeyboardAwareScrollView style={styles.container}>
       <Icon
         type="material-community"
         name="note-plus-outline"
         size={100}
-        color="#438F68"
-        style={{ alignSelf: "center" }}
+        color="#fff"
+        style={styles.icon}
       />
-      <Input
-        value={formik.values.titulo}
-        placeholder="Titulo de la nota"
-        containerStyle={styles.input}
-        rightIcon={
-          <Icon
-            type="material-community"
-            name="message-text-outline"
-            iconStyle={styles.icon}
-          />
-        }
-        onChangeText={(text) => formik.setFieldValue("titulo", text)}
-        errorMessage={formik.errors.titulo}
-      />
-      <View style={styles.containerNota}>
-      <Input
-        style={styles.nota}
-        multiline={true}
-        placeholder="Ingrese su nota"
-        value={formik.values.contenido}
-        onChangeText={(text) => formik.setFieldValue("contenido", text)}
-        errorMessage={formik.errors.contenido}
-      />
+      <View style={styles.card}>
+        <Input
+          value={formik.values.titulo}
+          placeholder="Título de la nota"
+          containerStyle={styles.input}
+          rightIcon={
+            <Icon
+              type="material-community"
+              name="message-text-outline"
+              iconStyle={styles.icon}
+            />
+          }
+          onChangeText={(text) => formik.setFieldValue('titulo', text)}
+          errorMessage={formik.errors.titulo}
+        />
+        <Input
+          style={styles.nota}
+          multiline={true}
+          placeholder="Ingrese su nota"
+          value={formik.values.contenido}
+          onChangeText={(text) => formik.setFieldValue('contenido', text)}
+          errorMessage={formik.errors.contenido}
+        />
+        <Button
+          icon={<Icon type="font-awesome" name="save" size={20} color="#fff" style={styles.iconoGuardar} />}
+          title="Guardar nota"
+          containerStyle={styles.btnContainer}
+          buttonStyle={styles.btn}
+          onPress={formik.handleSubmit as any}
+          loading={formik.isSubmitting}
+        />
       </View>
-    
-      <Button
-        icon={<Icon type="font-awesome" name="save" size={20} color="#fff" />}
-        title={" Guardar nota"}
-        containerStyle={styles.btnContainer}
-        buttonStyle={styles.btn}
-        onPress={formik.handleSubmit as any}
-        loading={formik.isSubmitting}
-      />
       <Loading visible={isLoading} text="Cargando..." />
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  viewContent: {
-    //tarjeta gris de fondo
-    backgroundColor: "#f5f6fa",
+  container: {
+    height: '100%',
+    backgroundColor: '#007ACC',
+    padding: 10,
+  },
+  card: {
+    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 10,
-    margin: 10,
-  },
-  input: {
-    width: "100%",
-    marginTop: 15,
-    backgroundColor: "#fff",
-    borderRadius: 10,
   },
   icon: {
-    color: "#c1c1c1",
+    alignSelf: 'center',
+  },
+  iconoGuardar: {
+    marginRight: 10,
+  },
+  input: {
+    marginTop: 15,
+  },
+  nota: {
+    height: 200,
+    marginVertical: 10,
   },
   btnContainer: {
     marginTop: 15,
-    width: "95%",
-    alignSelf: "center",
+    alignSelf: 'center',
     borderRadius: 10,
+    width: '50%',
   },
   btn: {
-    backgroundColor: "#438F68",
-    // se centra el boton
+    backgroundColor: '#438F68',
   },
-
-  divider: {
-    backgroundColor: "#179275",
-    margin: 40,
-  },
-  title: {
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  nota: {
-    height: 150,
-    borderWidth: 1,
-    borderColor: '#000',
-    marginVertical: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-  },
-  containerNota: {
-    marginVertical: 10,
-    borderRadius: 8,
-    padding: 16,
-    paddingTop: 30,
-    backgroundColor: '#fff',
-  }
 });
 
