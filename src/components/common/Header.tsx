@@ -10,10 +10,10 @@ const options : NativeStackNavigationOptions = {
   title: title,
     headerStyle: {
       // Azul typescript
-      backgroundColor: colors.primary,
+      backgroundColor: colors.surface,
     },
     // color iconos barra de estado
-    headerTintColor: colors.background,
+    headerTintColor: colors.primary,
     headerTitleStyle: {
       fontWeight: 'bold',
     },
