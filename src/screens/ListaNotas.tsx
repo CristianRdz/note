@@ -75,7 +75,7 @@ export default function ListaNotas(props: any) {
               {item.titulo}
             </Text>
             <Text style={{ ...styles.contenido, color: colors.primary }}>
-              {item.contenido}
+              {item.contenido.substring(0, 30)}
             </Text>
             <Button
               mode="outlined"
