@@ -27,6 +27,7 @@ export default function App() {
 
   return (
     <PaperProvider>
+      <StatusBar style="auto" />
       <NavigationContainer theme={useTheme().dark ? DarkTheme : DefaultTheme}>
         <AppStack />
       </NavigationContainer>
