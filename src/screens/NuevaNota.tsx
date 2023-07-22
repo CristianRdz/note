@@ -1,20 +1,19 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
-import { Card, Icon, Input, Button } from 'react-native-elements';
+import { TextInput, Button, useTheme, Card } from 'react-native-paper';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Toast from 'react-native-toast-message';
 import { crearNota } from '../services/NotasService';
-import Loading from '../common/Loading';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Loading from '../components/common/Loading';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useNavigation } from '@react-navigation/native';
+import { color } from 'react-native-elements/dist/helpers';
+import { Colors } from '../utils/Colors';
 
 export default function NuevaNota() {
+  const { colors } = useTheme();
   const navigation = useNavigation();
-  const {routes} = navigation.getState();
-  const {params} = routes[routes.length - 1];
-  const {cargarNotas} = params;
-
   const [isLoading, setIsLoading] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -30,10 +29,13 @@ export default function NuevaNota() {
       try {
         const tituloForm: string = formData.titulo;
         const contenidoForm: string = formData.contenido;
-        console.log(formData);
         await crearNota(tituloForm, contenidoForm);
-        await cargarNotas();
-        navigation.goBack();
+        navigation.navigate({
+          name: "IndexScreenS",
+          params: {
+            actualizar: formData
+          },
+        } as never)
         Toast.show({
           type: 'success',
           position: 'top',
@@ -53,46 +55,34 @@ export default function NuevaNota() {
   });
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
-      <Icon
-        type="material-community"
-        name="note-plus-outline"
-        size={100}
-        color="#fff"
-        style={styles.icon}
-      />
-      <View style={styles.card}>
-        <Input
+    <KeyboardAwareScrollView style={{ ...styles.container, backgroundColor: colors.background }}>
+      <Card style={styles.card}>
+        <TextInput
+          label="Título de la nota"
           value={formik.values.titulo}
-          placeholder="Título de la nota"
-          containerStyle={styles.input}
-          rightIcon={
-            <Icon
-              type="material-community"
-              name="message-text-outline"
-              iconStyle={styles.icon}
-            />
-          }
+          style={styles.input}
           onChangeText={(text) => formik.setFieldValue('titulo', text)}
-          errorMessage={formik.errors.titulo}
+          error={formik.touched.titulo && !!formik.errors.titulo}
         />
-        <Input
+        <TextInput
           style={styles.nota}
-          multiline={true}
-          placeholder="Ingrese su nota"
+          label="Ingrese su nota"
           value={formik.values.contenido}
+          multiline
           onChangeText={(text) => formik.setFieldValue('contenido', text)}
-          errorMessage={formik.errors.contenido}
+          error={formik.touched.contenido && !!formik.errors.contenido}
         />
         <Button
-          icon={<Icon type="font-awesome" name="save" size={20} color="#fff" style={styles.iconoGuardar} />}
-          title="Guardar nota"
-          containerStyle={styles.btnContainer}
-          buttonStyle={styles.btn}
+          icon="content-save"
+          mode="contained"
           onPress={formik.handleSubmit as any}
           loading={formik.isSubmitting}
-        />
-      </View>
+          style={styles.btn}
+          contentStyle={styles.btnContent}
+        >
+          Editar nota
+        </Button>
+      </Card>
       <Loading visible={isLoading} text="Cargando..." />
     </KeyboardAwareScrollView>
   );
@@ -100,20 +90,13 @@ export default function NuevaNota() {
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    backgroundColor: '#007ACC',
+    flex: 1,
     padding: 10,
+    height: '100%',
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 20,
     padding: 10,
-  },
-  icon: {
-    alignSelf: 'center',
-  },
-  iconoGuardar: {
-    marginRight: 10,
   },
   input: {
     marginTop: 15,
@@ -122,14 +105,11 @@ const styles = StyleSheet.create({
     height: 200,
     marginVertical: 10,
   },
-  btnContainer: {
-    marginTop: 15,
-    alignSelf: 'center',
-    borderRadius: 10,
-    width: '50%',
-  },
   btn: {
-    backgroundColor: '#438F68',
+    borderRadius: 10,
+    marginVertical: 15,
+  },
+  btnContent: {
+    paddingVertical: 10,
   },
 });
-

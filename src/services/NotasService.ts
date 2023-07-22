@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Nota } from "../../models/Nota";
+import { Nota } from "../models/Nota";
 
 export async function crearNota(titulo: string, contenido: string) {
   try {
@@ -23,7 +23,6 @@ export async function obtenerNotas() {
   try {
     const notas = await AsyncStorage.getItem("notas");
     const notasParseadas: Nota[] = JSON.parse(notas || "[]");
-    console.log(notasParseadas)
     return notasParseadas;
   } catch (error) {
     console.log(error);

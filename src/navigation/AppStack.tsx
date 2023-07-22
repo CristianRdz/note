@@ -1,26 +1,26 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import IndexScreen from '../screens/IndexScreen';
 import Header from "../components/common/Header";
-import NotaNueva from "../screens/NotaNueva";
-import NotaEditar from "../screens/NotaEditar";
+import ListaNotas from "../screens/ListaNotas";
+import NuevaNota from "../screens/NuevaNota";
+import EditarNota from "../screens/EditarNota";
 const Stack = createNativeStackNavigator();
 export default function AppStack() {
   return (
     <Stack.Navigator>    
       <Stack.Screen
         name="IndexScreenS"
-        component={IndexScreen}
+        component={ListaNotas}
         options={Header("Notas")}
       />
       <Stack.Screen
         name="NuevaNotaS"
-        component={NotaNueva}
+        component={NuevaNota}
         options={Header("Nueva Nota")}
       />
       <Stack.Screen
         name="EditarNotaS"
-        component={NotaEditar}
+        component={EditarNota}
         options={Header("Editar Nota")}
       />
     </Stack.Navigator>
